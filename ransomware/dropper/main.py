@@ -85,4 +85,4 @@ for foldername, subfolders, filenames in os.walk(documents_dir):
             # Borrar de forma segura el archivo original
             borrar_archivo_seguro(file_path)
 
-print(f'Archivos cifrados con AES-256 en {documents_dir}. La clave AES cifrada ha sido guardada en "clave_aes_cifrada.txt". Los archivos originales han sido eliminados de forma segura.')
+print(f'Archivos cifrados con AES-256 en {documents_dir}. La clave AES cifrada ha sido guardada en "clave_aes_cifrada.txt". Los archivos originales han sido eliminados.')
