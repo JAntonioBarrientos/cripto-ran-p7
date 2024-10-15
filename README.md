@@ -3,7 +3,7 @@
 Para crear el entorno virtual, ejecutar el siguiente comando:
 
 ```bash
-python3 -m venv venv
+python -m venv venv
 ```
 
 Para activar el entorno virtual, en Windows:
