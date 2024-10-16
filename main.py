@@ -52,7 +52,7 @@ def cifrar_archivo_aes(archivo, clave_aes):
         datos = f.read()
 
     datos_cifrados = cipher.encrypt(pad(datos, AES.block_size))
-    with open(archivo + '.owo', 'wb') as f:
+    with open(archivo + '.owoaes', 'wb') as f:
         f.write(iv + datos_cifrados)
 
 # Función para borrar un archivo de forma segura
