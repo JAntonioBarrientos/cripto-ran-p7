@@ -32,5 +32,5 @@ pip install -r requirements.txt
 Para crear el ejecutable, ejecutar el siguiente comando:
 
 ```bash
-pyinstaller --onefile --add-data "public_key.pem;." --add-data "fondo.jpeg;." --add-data "wallet.txt;." main.py
+pyinstaller --onefile --add-data "public_key.pem;." --add-data "fondo.png;." --add-data "wallet.txt;." main.py
 ```
