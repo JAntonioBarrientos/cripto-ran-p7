@@ -71,7 +71,7 @@ def descifrar_archivos_documentos():
     private_key = leer_clave_privada()
 
     # Leer la clave AES cifrada desde el archivo
-    with open(os.path.join(documents_dir, 'clave_aes_cifrada.owoaes'), 'r') as f:
+    with open(os.path.join(documents_dir, 'clave_aes_cifrada.lol'), 'r') as f:
         clave_aes_cifrada = f.read()
 
     # Descifrar la clave AES con la clave privada RSA

