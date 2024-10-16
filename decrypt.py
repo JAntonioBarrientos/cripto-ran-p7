@@ -58,7 +58,7 @@ def descifrar_archivo_aes(archivo, clave_aes):
     datos_descifrados = unpad(cipher.decrypt(datos_cifrados), AES.block_size)
 
     # Guardar los datos descifrados en el archivo original (sin la extensión .owo)
-    archivo_descifrado = archivo.replace('.enc', '')
+    archivo_descifrado = archivo.replace('.owo', '')
     with open(archivo_descifrado, 'wb') as f:
         f.write(datos_descifrados)
 
@@ -71,7 +71,7 @@ def descifrar_archivos_documentos():
     private_key = leer_clave_privada()
 
     # Leer la clave AES cifrada desde el archivo
-    with open(os.path.join(documents_dir, 'clave_aes_cifrada.txt.owo'), 'r') as f:
+    with open(os.path.join(documents_dir, 'clave_aes_cifrada.owo'), 'r') as f:
         clave_aes_cifrada = f.read()
 
     # Descifrar la clave AES con la clave privada RSA
