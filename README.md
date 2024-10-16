@@ -5,9 +5,9 @@ El programa es un ransomware que encripta los archivos de un directorio y solici
 
 Para generar el ejecutable se utilizó PyInstaller. Se debe correr en un entorno virtual de Python 3.8 en Windows 10 para asegurar la compatibilidad.
 
-Una vez generado el ejecutable, se puede ejecutar en cualquier sistema operativo Windows 10 (no es necesario tener Python instalado).
+Una vez generado el ejecutable, se puede ejecutar en cualquier sistema operativo Windows 10 x64 (no es necesario tener Python instalado).
 
-El ransomware **necesita** permisos de administrador para poder ejecutarse. No es necesario apagar el antivirus para ejecutar el ransomware, pero para que al final no sea eliminado el ejecutable, se debe agregar una excepción en el antivirus o desactivarlo.
+El ransomware **necesita** permisos de administrador para poder ejecutarse. Empíricamente no fue necesario desactivar el antivirus para ejecutar el ransomware, pero en caso de tener problemas se recomienda apagar el antivirus.
 
 
 
